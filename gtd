@@ -1,0 +1,273 @@
+# A common script to manage multiple GTD folders in git repo from multiple location
+# and other shortcuts
+
+# Usage: gtd help
+# Author: droidshow
+# Last updated: 2018-10-02
+#
+
+GTD_VERSION="0.1"
+SUPPORTED_GTD_CONFIG_VERSION="0.1"
+PROGNAME=$(basename $0)
+GTD_CONFIG=$HOME/.gtd
+USAGE="USEAGE: ${PROGNAME} [ agenda | status | commit | pull | push | map | unmap | usb | local | help ]"
+
+
+#--------------------------------------------------------------------------------------
+# Helper functions to mount t: or z: drives for gtd folder
+
+function usb {
+    $UNMAP
+    $MAP_TO_USB
+    $MAP_CHECK
+}
+
+function local {
+    echo "$UNMAP"
+    $UNMAP
+    $MAP_TO_LOCAL
+    $MAP_CHECK
+}
+
+function map {
+    $MAP_CHECK
+}
+
+function unmap {
+    $UNMAP
+}
+
+#--------------------------------------------------------------------------------------
+# git status of gtd0 and gtd2
+
+function status() {
+    _change_dir $GTD0
+    _status
+
+    _change_dir $GTD2
+    _status
+
+    echo; echo "  -----------------OK----------------------"; echo
+    return
+}
+
+
+#--------------------------------------------------------------------------------------
+# git commit of gtd0 and gtd2
+
+function commit() {
+    _change_dir $GTD0
+    _commit
+
+    _change_dir $GTD2
+    _commit
+
+    echo; echo " -----------------OK----------------------"; echo
+    return 0
+}
+
+#--------------------------------------------------------------------------------------
+# git pull gtd0 and gtd2
+
+function pull() {
+    _change_dir $GTD0
+    _pull
+    
+    _change_dir $GTD2
+    _pull
+
+    echo; echo " ------------------OK---------------------"; echo
+    return 0
+}
+
+#--------------------------------------------------------------------------------------
+# git push gtd0 and gtd2 to their remote repos
+
+function push() {
+    _change_dir $GTD0
+    _pull
+    _push
+
+    _change_dir $GTD2
+    _pull
+    _push
+
+    echo; echo " ------------------ OK ---------------------"; echo
+    return 0
+}
+
+
+#--------------------------------------------------------------------------------------
+# invoke emacs with agenda
+
+function agenda() {
+
+    if [ -e $EMACS ]; then
+        $EMACS --funcall org-agenda-list
+    else
+        error_exit "Ln: $LINENO ERROR: $? : Cannot find $EMACS"
+    fi
+
+       echo; echo " ------------------ OK ---------------------"; echo
+       return 0;
+}
+
+#--------------------------------------------------------------------------------------
+
+_change_dir() {
+    cd $1 || error_exit "Ln: $LINENO ERROR: $? : Cannot change directory to $1"
+}
+
+_status() {
+    echo; echo "  :::::::::::::::::: STATUS @ $(pwd) ::::::::::::::::::"; echo
+    git fetch
+    git status
+
+    return 0
+}
+
+_commit() {
+    echo; echo "  :::::::::::::::::: COMMIT @ $(pwd) ::::::::::::::::::"; echo
+
+    git status -s
+    !(git status -s | grep -q '?? ') || error_exit "Ln: $LINENO ERROR: $? : has un tracked file/s, 'git add' or clean-up first"
+    git commit -am "$COMMIT_MSG"  # DO NOT check for error, need to process gtd2
+
+    return 0
+}
+
+_pull() {
+    echo; echo "  :::::::::::::::::: PULL @ $(pwd) ::::::::::::::::::"; echo
+
+    echo "git pull origin master"
+    git pull origin master  || error_exit "Ln: $LINENO ERROR: $? : Cannot pull origin"
+
+    echo "git rebase master"
+    git rebase master  || error_exit "Ln: $LINENO ERROR: $? : Cannot rebase master"
+
+    git status
+
+    return 0
+}
+
+_push() {
+    echo; echo "  :::::::::::::::::: PUSH @ $(pwd) ::::::::::::::::::"; echo
+
+    # remember which branch we came from, because we will switch to master shortly
+    previous_branch=`git branch | grep '* ' | tr -d '* '`  || error_exit "Ln: $LINENO ERROR: $? : Cannot find branch"
+    # if already in master branch then something wrong ?
+    if [ $previous_branch == "master" ]; then
+        error_exit "Ln: $LINENO ERROR: : IN MASTER BRANCH"
+    fi
+
+    # now switch to master branch
+    echo "git checkout master"
+    git checkout master   || error_exit "Ln: $LINENO ERROR: $? : Cannot checkout master"
+    if [ $? -ne 0 ]; then  echo "Ln: $LINENO ERROR: $?"; return 1; fi
+
+    # NOTE : Here, we are in master branch, on error restore to previous branch
+    echo "git merge $previous_branch"
+    git merge $previous_branch
+    if [ $? -ne 0 ]; then
+        echo "ERROR: revert to previous branch :$previous_branch"
+        git checkout $previous_branch
+        error_exit "Ln: $LINENO ERROR: $? : Cannot merge $previous_branch"
+    fi
+
+    # NOTE : Here, we are in master branch, on error restore to previous branch
+    echo "git push origin master"
+    git push origin master
+    if [ $? -ne 0 ]; then
+        echo "ERROR: revert to previous branch :$previous_branch"
+        git checkout $previous_branch
+        error_exit "Ln: $LINENO ERROR: $? : Cannot push to orgin"
+    fi
+
+    echo "git checkout $previous_branch"
+    git checkout $previous_branch || error_exit "Ln: $LINENO ERROR: $? : Cannot checkout $previous_branch"
+
+    git status
+    
+    return 0
+}
+
+#--------------------------------------------------------------------------------------
+# Error handling
+
+help() {
+     echo; echo $USAGE
+}
+
+error_exit(){
+    echo; echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2; echo
+    exit 1
+}
+
+#--------------------------------------------------------------------------------------
+# Configuration
+
+check_config(){
+    echo "Check config"
+
+    if [ ! $GTD_PATH ]; then
+        error_exit "Ln: $LINENO ERROR: $? : GTD_PATH not set in $GTD_CONFIG"
+    elif [ ! $COMMIT_MSG ]; then
+        error_exit "Ln: $LINENO ERROR: $? : COMMIT_MSG not set in $GTD_CONFIG"
+    elif [ ! $MAP_CHECK ]; then
+        error_exit "Ln: $LINENO ERROR: $? : MAP_CHECK not set in $GTD_CONFIG"
+    elif [ ! $MAP_TO_USB ]; then
+        error_exit "Ln: $LINENO ERROR: $? : MAP_TO_USB not set in $GTD_CONFIG"
+    elif [ ! $MAP_TO_LOCAL ]; then
+        error_exit "Ln: $LINENO ERROR: $? : MAP_TO_LOCAL not set in $GTD_CONFIG"
+    elif [ ! $UNMAP ]; then
+        error_exit "Ln: $LINENO ERROR: $? : UNMAP not set in $GTD_CONFIG"
+    elif [ ! $EMACS ]; then
+        error_exit "Ln: $LINENO ERROR: $? : EMACS not set in $GTD_CONFIG"
+    fi
+}
+
+
+if [ ! -f $GTD_CONFIG ]; then
+    error_exit "Ln: $LINENO ERROR: $? : Configuration file not found : $GTD_CONFIG"
+fi
+
+check_config "$GTD_CONFIG"
+
+source $GTD_CONFIG
+
+
+#--------------------------------------------------------------------------------------
+
+# Check if the function is supported and call the function
+case "$1" in
+    "agenda")
+    ;& # falls through
+    "status")
+    ;&
+    "commit")
+    ;&
+    "pull")
+    ;&
+    "push")
+    ;&
+    "map")
+    ;&
+    "unmap")
+    ;&
+    "usb")
+    ;&
+    "local")
+    ;&
+    "help")
+        # call the function
+        "$@"
+        ;;
+    "") # script called without an argument
+        ;& # fall through and display help message
+    *)
+        help
+        error_exit "ERROR : USAGE : '${1:-"empty argument"}' is not supported"
+        ;;
+
+esac
+
