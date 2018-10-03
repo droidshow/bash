@@ -226,6 +226,48 @@ check_config(){
     fi
 }
 
+config_extract_repo_dir() {
+
+    #WARNING: Using for loop might separate out dir and repo if there is space
+    #         in between them
+    count=0
+    while [ "x${GTD_PROJECTS[count]}" != "x" ]; do
+        # Extract the repo part of dir<repo>
+        p=${GTD_PROJECTS[count]}
+        # output: gtd3 <https://github.com/droidshow/bash.git>
+
+        r="${p#*<}"  # Deletefrom the front till nearest '<'
+        # output: https://github.com/droidshow/bash.git>
+
+        r="${r%>*}"  # Delete from the end till nearest '>'
+        # output: https://github.com/droidshow/bash.git
+
+        GTD_PROJECTS_REPO[count]=$r
+
+        # Extract the dir part of dir<repo>
+        d="${p%<*}"   # Delete from the end till nearest '<'
+        d="${d/ /}"    # Remove any spaces
+        # output: gtd3
+
+
+        # and extract the project name from repo
+        n="${r##*/}"   # Delete from the front till furthest '/'
+        # output: bash.git
+
+        n="${n/.git/}" # Replace .git with nothing
+        # output: bash
+
+        if [ -z $d ]; then
+            rp="$n"
+        else
+            rp="$d/$n"
+        fi
+
+        GTD_PROJECTS_DIR[count]="$rp"
+        count=$(($count+1))
+    done
+}
+
 
 if [ ! -f $GTD_CONFIG ]; then
     error_exit "Ln: $LINENO ERROR: $? : Configuration file not found : $GTD_CONFIG"
@@ -235,6 +277,7 @@ source $GTD_CONFIG
 
 check_config "$GTD_CONFIG"
 
+config_extract_repo_dir
 
 #--------------------------------------------------------------------------------------
 
