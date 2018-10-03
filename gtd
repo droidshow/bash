@@ -209,19 +209,19 @@ error_exit(){
 check_config(){
     echo "Check config"
 
-    if [ ! $GTD_PATH ]; then
+    if [ -z "$GTD_PATH" ]; then
         error_exit "Ln: $LINENO ERROR: $? : GTD_PATH not set in $GTD_CONFIG"
-    elif [ ! $COMMIT_MSG ]; then
+    elif [ -z "$COMMIT_MSG" ]; then
         error_exit "Ln: $LINENO ERROR: $? : COMMIT_MSG not set in $GTD_CONFIG"
-    elif [ ! $MAP_CHECK ]; then
+    elif [ -z "$MAP_CHECK" ]; then
         error_exit "Ln: $LINENO ERROR: $? : MAP_CHECK not set in $GTD_CONFIG"
-    elif [ ! $MAP_TO_USB ]; then
+    elif [ -z "$MAP_TO_USB" ]; then
         error_exit "Ln: $LINENO ERROR: $? : MAP_TO_USB not set in $GTD_CONFIG"
-    elif [ ! $MAP_TO_LOCAL ]; then
+    elif [ -z "$MAP_TO_LOCAL" ]; then
         error_exit "Ln: $LINENO ERROR: $? : MAP_TO_LOCAL not set in $GTD_CONFIG"
-    elif [ ! $UNMAP ]; then
+    elif [ -z "$UNMAP" ]; then
         error_exit "Ln: $LINENO ERROR: $? : UNMAP not set in $GTD_CONFIG"
-    elif [ ! $EMACS ]; then
+    elif [ -z "$EMACS" ]; then
         error_exit "Ln: $LINENO ERROR: $? : EMACS not set in $GTD_CONFIG"
     fi
 }
@@ -231,9 +231,9 @@ if [ ! -f $GTD_CONFIG ]; then
     error_exit "Ln: $LINENO ERROR: $? : Configuration file not found : $GTD_CONFIG"
 fi
 
-check_config "$GTD_CONFIG"
-
 source $GTD_CONFIG
+
+check_config "$GTD_CONFIG"
 
 
 #--------------------------------------------------------------------------------------
