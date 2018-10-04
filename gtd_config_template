@@ -1,0 +1,87 @@
+################################################################################
+# This is a configuration file template. Copy this file to $HOME/.gtd before
+# running gtd utility. The .gtd file is used for customising the gtd utility
+# for a particu environment e.g. ubuntu, windows at home, office etc.
+#
+# All configs sections with TODO: CUSTOMIZE have to be set with appropriate values
+# Lines starting with '#' are commens and will be ignored
+################################################################################
+
+# Any optional message to indicate where you are when you run gtd
+echo; echo "  :::::::::::::::::: IN ANDROMEDA ::::::::::::::::::"; echo
+
+# TODO: CUSTOMIZE
+# Path where you want to mount your gtd folders
+# This maybe different for different environments
+# gtd map / unmap / local / usb use this
+# Examples:
+#   GTD_PATH=/t
+#   GTD_PATH=/z
+GTD_PATH=
+
+# Commit message to use while running 'gtd commit'
+# Examples:
+#   COMMIT_MSG="HU1 Udpate : $(date +%F_%H%M)"
+#   COMMIT_MSG="OW media udpate : $(date +%F_%H%M)"
+COMMIT_MSG="Commited on : $(date +%F_%H%M) while in Andromeda"
+
+# TODO: CUSTOMIZE
+# The shell command used to show where GTD_PATH is mounted
+# Examples:
+#   MAP_CHECK="ls -l $GTD_PATH" # For Ubuntu etc.
+#   MAP_CHECK="subst"  # For Windows enviornment
+MAP_CHECK=""
+
+# TODO: CUSTOMIZE
+# The shell command used to link your gtd folder on an USB drive to GTD_PATH
+# Examples:
+#   MAP_TO_USB="sudo ln -s /media/$USER/usbdrive/myname/gtd /t" # For Ubuntu etc.
+#   MAP_TO_USB="subst T: /d/myname/gtd" # For windows
+MAP_TO_USB=""
+
+# TODO: CUSTOMIZE 
+# The shell command used to link your gtd folder on local drive to GTD_PATH
+# Examples:
+#   MAP_TO_LOCAL="sudo ln -s /home/$USER/gtd /t" # For Ubuntu etc.
+#   MAP_TO_LOCAL="subst T: /c/myname/gtd" # For Windows
+MAP_TO_LOCAL=""
+
+# TODO: CUSTOMIZE 
+# Command to delink GTD_PATH"
+# Examples:
+#   UNMAP="sudo rm /t" # For Ubuntu etc.
+#   UNMAP="subst /D t:" # For Windows 7
+#   UNMAP="SUBST //D /T:" # For Windows 10
+UNMAP=""
+
+# TODO: CUSTOMIZE 
+# Command to invoke emacs.
+# In windows git-bash  use the format 
+# Examples:
+#   EMACS="emacs" # For Ubuntu etc.
+#   EMACS="/c/path/to/emacs/bin/runemacs.exe" # For Windows
+EMACS=""
+
+# Array of git repos to maintain
+# subdir<repopath>
+# subdir : optional subdir under $GTD_PATH to checkout the repo under
+# repopath : the git repo path
+# Examples :
+ # GTD_PROJECTS=(
+ #     'scripts <https://github.com/droidshow/bash.git>'
+ #     'kernel <https://github.com/torvalds/linux.git>'
+ # )
+ GTD_PROJECTS=
+
+
+
+################################################################################
+# DO NOT MODIFY 
+################################################################################
+
+GTD_CONFIG_VERSION="0.1"
+
+# TODO: DEV
+# On first run this will be copied template.gtd to $HOME directory
+# if a .gtd file is not found there. On subsequent run this file will be included
+# from gtd utility.
