@@ -41,11 +41,10 @@ function unmap {
 # git status of gtd0 and gtd2
 
 function status() {
-    _change_dir $GTD0
-    _status
-
-    _change_dir $GTD2
-    _status
+    for r in ${GTD_PROJECTS_DIR[@]}; do
+        _change_dir "$GTD_PATH/$r"
+        _status
+    done
 
     echo; echo "  -----------------OK----------------------"; echo
     return
@@ -56,11 +55,10 @@ function status() {
 # git commit of gtd0 and gtd2
 
 function commit() {
-    _change_dir $GTD0
-    _commit
-
-    _change_dir $GTD2
-    _commit
+    for r in ${GTD_PROJECTS_DIR[@]}; do
+        _change_dir "$GTD_PATH/$r"
+        _commit
+    done
 
     echo; echo " -----------------OK----------------------"; echo
     return 0
@@ -70,12 +68,11 @@ function commit() {
 # git pull gtd0 and gtd2
 
 function pull() {
-    _change_dir $GTD0
-    _pull
+    for r in ${GTD_PROJECTS_DIR[@]}; do
+        _change_dir "$GTD_PATH/$r"
+        _pull
+    done
     
-    _change_dir $GTD2
-    _pull
-
     echo; echo " ------------------OK---------------------"; echo
     return 0
 }
@@ -84,13 +81,11 @@ function pull() {
 # git push gtd0 and gtd2 to their remote repos
 
 function push() {
-    _change_dir $GTD0
-    _pull
-    _push
-
-    _change_dir $GTD2
-    _pull
-    _push
+    for r in ${GTD_PROJECTS_DIR[@]}; do
+        _change_dir "$GTD_PATH/$r"
+        _pull
+        _push
+    done
 
     echo; echo " ------------------ OK ---------------------"; echo
     return 0
