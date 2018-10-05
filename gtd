@@ -97,14 +97,10 @@ function push() {
 
 function agenda() {
 
-    if [ -e $EMACS ]; then
-        $EMACS --funcall org-agenda-list
-    else
-        error_exit "Ln: $LINENO ERROR: $? : Cannot find $EMACS"
-    fi
+    $EMACS --funcall org-agenda-list || error_exit "Ln: $LINENO ERROR: $? : Error running $EMACS"
 
-       echo; echo " ------------------ OK ---------------------"; echo
-       return 0;
+    echo; echo " ------------------ OK ---------------------"; echo
+    return 0;
 }
 
 #--------------------------------------------------------------------------------------
