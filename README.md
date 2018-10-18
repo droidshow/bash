@@ -1,6 +1,6 @@
 ### bash
 #### A git repo with collection of helper bash scripts:
-- [gtd](https://github.com/droidshow/bash/new/master?readme=1#gtd "Description, setup, usage") : Handle multiple git projects with common commands
+- [gtd](https://github.com/droidshow/bash#gtd "Description, setup, usage") : Handle multiple git projects with common commands
 
 ----------------------------------------------------------------------------------------------------------------------------
 ## gtd
