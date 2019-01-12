@@ -7,7 +7,7 @@
 # Add following to ~/.bashrc or ~/.bash_aliases
 # test -f /path/to/this/file && . /path/to/this/file
 
-echo "Customizing bash ..."
+echo "Customizing bash from : ${BASH_SOURCE[0]} for ..."
 
 ##################################################################
 # EXPORTS
