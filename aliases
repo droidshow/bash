@@ -1,0 +1,147 @@
+##################################################################
+# DESCRIPTION:
+# This is a set of aliases and functions to customize bash
+# environment to ones need.
+#
+# SETUP:
+# Add following to ~/.bashrc or ~/.bash_aliases
+# test -f /path/to/this/file && . /path/to/this/file
+
+echo "Customizing bash ..."
+
+##################################################################
+# EXPORTS
+#
+
+export EDITOR=emacs
+export HISTTIMEFORMAT='%F_%H%M '
+
+
+##################################################################
+# Find the path of this script and add it to PATH to make available
+# other companion script to rest of the system
+#
+SOURCE="${BASH_SOURCE[0]}"
+# resolve $SOURCE until the file is no longer a symlink
+while [ -h "$SOURCE" ]; do 
+  MYPATH="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  # if $SOURCE was a relative symlink, we need to resolve it relative
+  # to the path where the symlink file was located
+  [[ $SOURCE != /* ]] && SOURCE="$MYPATH/$SOURCE" 
+done
+MYPATH="$( cd -P "$( dirname "$SOURCE" )" >/dev/null && pwd )"
+PATH=$PATH:$MYPATH
+
+
+################################################################################
+# Check if emacs is installed if not install
+#
+
+EMACS_DLOAD_URL=http://ftpmirror.gnu.org/windows/emacs
+EMACS_VERSION=emacs-26/emacs-26.1-x86_64.zip
+
+case "$OSTYPE" in
+    solaris*)
+        echo "SOLARIS"
+        ;;
+    darwin*)
+        echo "OSX"
+        ;; 
+    linux*)
+        # In Linux OS
+        echo "LINUX"
+        # for distros with apt-get package manager
+        which emacs || (which apt-get && echo "Install emacs" && apt-get install emacs)
+        # for distros with yum package manager
+        which emacs || (which yum &&  echo "Install emacs" && yum install emacs)
+        ;;
+    bsd*)
+        echo "BSD"
+        ;;
+    msys*)
+        echo "WINDOWS"
+        which emacs 2>&1 >> /dev/null || (echo -e "Emacs not installed. Run ...\n "curl -O $EMACS_DLOAD_URL/$EMACS_VERSION" \ntakes about 15-20 mins (2018)!")
+        ;;
+    *)
+        echo "unknown: $OSTYPE"
+        ;;
+esac
+
+
+##################################################################
+# Aliases
+#
+
+#
+alias ll='ls -alF'
+
+# Virtual Box 
+# Mount shared drive 'vmshared' in virtual box to '~/host'
+alias mntvbsf='sudo mount -t vboxsf vmshared ~/host'
+
+# Shortcuts to change directories
+alias cd-='cd -'
+alias cd1='cd ..'
+alias cd2='cd ../..'
+alias cd3='cd ../../..'
+alias cd4='cd ../../../..'
+alias cd5='cd ../../../../..'
+alias cd6='cd ../../../../../..'
+alias cd7='cd ../../../../../../..'
+alias cd8='cd ../../../../../../../..'
+alias cd9='cd ../../../../../../../../..'
+alias cd10='cd ../../../../../../../../../..'
+
+
+##################################################################
+# mkdircd : Create a directory and cd into it
+#
+function mkdircd () { mkdir -p "$@" && eval cd "\"\$$#\""; }
+
+
+##################################################################
+# mkbackup : Backup a directory with timestamp
+#
+function mkbackup () { tar czvf $(date +%F_%H%M)_$(basename "$1").tgz "$1"; }
+
+
+##################################################################
+# dot2png : Converts multiple dot files in a directory to png files
+# usage : cd to directory containing dot files and run dot2png
+#
+function dot2png () {
+    DOT_FILES=`ls | grep dot`
+    for dot_file in $DOT_FILES
+    do
+	png_file=`echo $dot_file | sed s/.dot/.png/`
+	dot -Tpng $dot_file > $png_file
+    done
+}
+
+
+##################################################################
+# repo helper
+# which-repo : Find which repo the directory belonds to
+#
+
+function which-repo {
+    # default to the current working directory,
+    # but take an arg if one is provided
+    local arg=${1:-$PWD}
+
+    # Canonicalize the path
+    arg=$(readlink -f $arg)
+
+    repo forall -c 'arg='"$arg"'; if [[ "$arg" != "${arg%$REPO_PATH}" ]]; then echo "$REPO_PROJECT"; fi'
+}
+
+
+##################################################################
+# repo helper
+# list-repo : list all the projects in the repo
+#
+
+function list-repo {
+    repo forall -c 'echo "$REPO_PATH : $REPO_PROJECT"'
+}
