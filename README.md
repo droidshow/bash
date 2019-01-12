@@ -1,7 +1,7 @@
 ### bash
 #### A git repo with collection of helper bash scripts:
 - [gtd](https://github.com/droidshow/bash#gtd "Description, setup, usage") : Handle multiple git projects with common commands
-
+- [aliases](https://github.com/droidshow/bash#aliases "Description, setup, usage") : Aliases and functions for bash environment
 ----------------------------------------------------------------------------------------------------------------------------
 ## gtd
 A script to help run common git commands on multiple git repos and some custom functions. All the repos are expected to be under a common directory (they can be in subdirectories). This common top level directory is mapped/linked to a drive e.g. Z: or /z. The common directory can be locally on a computing platform on harddisk or on a USB stick for portability or both. When the repos are both local and portable, script has useful commands like 'gtd usb' or 'gtd local' to quickly map one of them to Z: for further operations. What each command actually does is defined in the platform specifict config file .gtd in the home directory.
@@ -26,4 +26,6 @@ I maintain emacs org mode file as few different git projects. I use this commmon
 
 
 ----------------------------------------------------------------------------------------------------------------------------
+## aliases
+A collection of aliases and functions to customize bash environment. Exports editor. Installs emacs if not found.
 
