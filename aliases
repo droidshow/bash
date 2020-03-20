@@ -102,9 +102,13 @@ function mkdircd () { mkdir -p "$@" && eval cd "\"\$$#\""; }
 
 ##################################################################
 # mkbackup : Backup a directory with timestamp
-#
+# usage : cd to directory where to backup and mkbackup <path to dir to backup>
 function mkbackup () { tar czvf $(date +%F_%H%M)_$(basename "$1").tgz "$1"; }
 
+##################################################################
+# xtract2 : Create a directory and extract the tar ball to that
+# usage : xtract2 filename.tgz
+function xtract2 () { mkdir -p ${1%.*} && tar -C $_ -xvf $1; }
 
 ##################################################################
 # dot2png : Converts multiple dot files in a directory to png files
